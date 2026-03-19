@@ -1,21 +1,23 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
+"use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { RefreshCw, Trophy, User, Hash } from 'lucide-react';
 
 type Player = 'X' | 'O' | null;
 
-const WINNING_COMBINATIONS = [
-  [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
-  [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
-  [0, 4, 8], [2, 4, 6]             // Diagonals
+const WINNING_COMBINATIONS: number[][] = [
+  [0, 1, 2],
+  [3, 4, 5],
+  [6, 7, 8], // Rows
+  [0, 3, 6],
+  [1, 4, 7],
+  [2, 5, 8], // Columns
+  [0, 4, 8],
+  [2, 4, 6], // Diagonals
 ];
 
-export default function App() {
+export default function TicTacToeGame() {
   const [board, setBoard] = useState<Player[]>(Array(9).fill(null));
   const [isXNext, setIsXNext] = useState<boolean>(true);
   const [winner, setWinner] = useState<Player | 'Draw'>(null);
@@ -25,13 +27,19 @@ export default function App() {
   const checkWinner = (currentBoard: Player[]) => {
     for (const combo of WINNING_COMBINATIONS) {
       const [a, b, c] = combo;
-      if (currentBoard[a] && currentBoard[a] === currentBoard[b] && currentBoard[a] === currentBoard[c]) {
+      if (
+        currentBoard[a] &&
+        currentBoard[a] === currentBoard[b] &&
+        currentBoard[a] === currentBoard[c]
+      ) {
         return { winner: currentBoard[a], line: combo };
       }
     }
-    if (currentBoard.every(cell => cell !== null)) {
+
+    if (currentBoard.every((cell) => cell !== null)) {
       return { winner: 'Draw' as const, line: null };
     }
+
     return null;
   };
 
@@ -40,6 +48,7 @@ export default function App() {
 
     const newBoard = [...board];
     newBoard[index] = isXNext ? 'X' : 'O';
+
     setBoard(newBoard);
     setIsXNext(!isXNext);
 
@@ -48,7 +57,11 @@ export default function App() {
       setWinner(result.winner);
       setWinningLine(result.line);
       if (result.winner !== 'Draw') {
-        setScores(prev => ({ ...prev, [result.winner as 'X' | 'O']: prev[result.winner as 'X' | 'O'] + 1 }));
+        setScores((prev) => ({
+          ...prev,
+          [result.winner as 'X' | 'O']:
+            prev[result.winner as 'X' | 'O'] + 1,
+        }));
       }
     }
   };
@@ -61,13 +74,12 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col items-center justify-center p-4 font-sans">
-      <motion.div 
+    <div className="w-full flex flex-col items-center justify-center p-4 font-sans">
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="max-w-md w-full space-y-6 sm:space-y-8"
       >
-        {/* Header */}
         <div className="text-center space-y-2">
           <h1 className="text-4xl sm:text-5xl font-black tracking-tighter italic text-emerald-500 uppercase">
             Tic-Tac-Toe
@@ -77,25 +89,46 @@ export default function App() {
           </p>
         </div>
 
-        {/* Scoreboard */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-          <div className={`p-3 sm:p-4 rounded-2xl border transition-all duration-300 ${isXNext && !winner ? 'bg-emerald-500/10 border-emerald-500/50' : 'bg-zinc-900 border-zinc-800'}`}>
+          <div
+            className={`p-3 sm:p-4 rounded-2xl border transition-all duration-300 ${
+              isXNext && !winner
+                ? 'bg-emerald-500/10 border-emerald-500/50'
+                : 'bg-zinc-900 border-zinc-800'
+            }`}
+          >
             <div className="flex items-center justify-between mb-1">
-              <span className="text-xs font-bold uppercase tracking-wider text-zinc-500">Player X</span>
-              <User size={14} className={isXNext && !winner ? 'text-emerald-500' : 'text-zinc-600'} />
+              <span className="text-xs font-bold uppercase tracking-wider text-zinc-500">
+                Player X
+              </span>
+              <User
+                size={14}
+                className={isXNext && !winner ? 'text-emerald-500' : 'text-zinc-600'}
+              />
             </div>
             <div className="text-2xl sm:text-3xl font-black">{scores.X}</div>
           </div>
-          <div className={`p-3 sm:p-4 rounded-2xl border transition-all duration-300 ${!isXNext && !winner ? 'bg-emerald-500/10 border-emerald-500/50' : 'bg-zinc-900 border-zinc-800'}`}>
+
+          <div
+            className={`p-3 sm:p-4 rounded-2xl border transition-all duration-300 ${
+              !isXNext && !winner
+                ? 'bg-emerald-500/10 border-emerald-500/50'
+                : 'bg-zinc-900 border-zinc-800'
+            }`}
+          >
             <div className="flex items-center justify-between mb-1">
-              <span className="text-xs font-bold uppercase tracking-wider text-zinc-500">Player O</span>
-              <User size={14} className={!isXNext && !winner ? 'text-emerald-500' : 'text-zinc-600'} />
+              <span className="text-xs font-bold uppercase tracking-wider text-zinc-500">
+                Player O
+              </span>
+              <User
+                size={14}
+                className={!isXNext && !winner ? 'text-emerald-500' : 'text-zinc-600'}
+              />
             </div>
             <div className="text-2xl sm:text-3xl font-black">{scores.O}</div>
           </div>
         </div>
 
-        {/* Game Board */}
         <div className="relative aspect-square bg-zinc-900 rounded-3xl p-3 sm:p-4 border border-zinc-800 shadow-2xl overflow-hidden">
           <div className="grid grid-cols-3 gap-2 sm:gap-3 h-full">
             {board.map((cell, i) => (
@@ -106,7 +139,11 @@ export default function App() {
                 onClick={() => handleClick(i)}
                 className={`
                   relative flex items-center justify-center text-4xl sm:text-5xl font-black rounded-lg sm:rounded-xl transition-colors
-                  ${winningLine?.includes(i) ? 'bg-emerald-500 text-zinc-950' : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-100'}
+                  ${
+                    winningLine?.includes(i)
+                      ? 'bg-emerald-500 text-zinc-950'
+                      : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-100'
+                  }
                   ${!cell && !winner ? 'cursor-pointer' : 'cursor-default'}
                 `}
               >
@@ -125,7 +162,6 @@ export default function App() {
             ))}
           </div>
 
-          {/* Winner Overlay */}
           <AnimatePresence>
             {winner && (
               <motion.div
@@ -134,11 +170,7 @@ export default function App() {
                 exit={{ opacity: 0, scale: 0.9 }}
                 className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-zinc-950/80 backdrop-blur-md p-6 sm:p-8 text-center"
               >
-                <motion.div
-                  initial={{ y: 20 }}
-                  animate={{ y: 0 }}
-                  className="space-y-4"
-                >
+                <motion.div initial={{ y: 20 }} animate={{ y: 0 }} className="space-y-4">
                   <div className="flex justify-center">
                     <div className="p-3 sm:p-4 bg-emerald-500 rounded-full text-zinc-950">
                       {winner === 'Draw' ? <Hash size={44} /> : <Trophy size={44} />}
@@ -151,7 +183,10 @@ export default function App() {
                     onClick={resetGame}
                     className="w-full py-3 sm:py-4 px-8 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold rounded-2xl transition-all flex items-center justify-center gap-2 group"
                   >
-                    <RefreshCw size={20} className="group-hover:rotate-180 transition-transform duration-500" />
+                    <RefreshCw
+                      size={20}
+                      className="group-hover:rotate-180 transition-transform duration-500"
+                    />
                     Play Again
                   </button>
                 </motion.div>
@@ -160,7 +195,6 @@ export default function App() {
           </AnimatePresence>
         </div>
 
-        {/* Footer Controls */}
         <div className="flex justify-center">
           <button
             onClick={resetGame}
@@ -174,3 +208,4 @@ export default function App() {
     </div>
   );
 }
+
